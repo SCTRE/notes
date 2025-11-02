@@ -19,7 +19,7 @@ class AudioManager {
 	async preload() {
 		return new Promise((resolve, reject) => {
 			try {
-				this.audio = new Audio('/music.m4a')
+				this.audio = new Audio('/notes/music.m4a')
 				this.audio.loop = true
 				this.audio.volume = 0.3 // 默认音量 30%
 
