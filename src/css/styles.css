@@ -1,0 +1,772 @@
+:root {
+	/* 默认使用黑暗模式 */
+	--bg-grid-color: #2a2a2a;
+	--bg-base-color: #1a1a1a;
+	--text-primary: #e0e0e0;
+	--text-secondary: rgba(255, 255, 255, 0.85);
+	--text-tertiary: rgba(255, 255, 255, 0.65);
+	--text-muted: rgba(255, 255, 255, 0.5);
+	--text-link: rgba(255, 255, 255, 0.75);
+	--text-link-hover: rgba(255, 255, 255, 0.95);
+
+	--card-bg: #2d2d2d;
+	--card-border: rgba(255, 255, 255, 0.1);
+	--card-shadow: rgba(0, 0, 0, 0.4);
+	--card-shadow-drag: rgba(0, 0, 0, 0.6);
+	--card-shadow-max: rgba(0, 0, 0, 0.7);
+	--card-header-bg: rgba(45, 45, 45, 0.8);
+
+	--control-border: rgba(255, 255, 255, 0.15);
+	--control-focus: rgba(255, 255, 255, 0.3);
+	--control-icon: rgba(255, 255, 255, 0.7);
+	--control-icon-close: rgba(0, 0, 0, 0.8);
+
+	/* 卡片颜色变量（黑暗模式） */
+	--card-color-0: #4a3942;
+	--card-color-1: #2f4858;
+	--card-color-2: #5a4a3a;
+	--card-color-3: #3a4a3a;
+	--card-color-4: #473a5a;
+	--card-color-5: #4a4a38;
+	--card-color-6: #364852;
+	--card-color-7: #52385a;
+}
+
+/* 浅色模式配色方案 */
+body.light-theme {
+	--bg-grid-color: #eee;
+	--bg-base-color: #fff;
+	--text-primary: #333;
+	--text-secondary: rgba(0, 0, 0, 0.72);
+	--text-tertiary: rgba(0, 0, 0, 0.55);
+	--text-muted: rgba(0, 0, 0, 0.5);
+	--text-link: rgba(0, 0, 0, 0.7);
+	--text-link-hover: rgba(0, 0, 0, 0.9);
+
+	--card-bg: #fff;
+	--card-border: rgba(0, 0, 0, 0.08);
+	--card-shadow: rgba(0, 0, 0, 0.18);
+	--card-shadow-drag: rgba(0, 0, 0, 0.35);
+	--card-shadow-max: rgba(0, 0, 0, 0.4);
+	--card-header-bg: rgba(255, 255, 255, 0.7);
+
+	--control-border: rgba(0, 0, 0, 0.08);
+	--control-focus: rgba(0, 0, 0, 0.25);
+	--control-icon: rgba(0, 0, 0, 0.6);
+	--control-icon-close: rgba(0, 0, 0, 0.7);
+
+	/* 卡片颜色变量（浅色模式） */
+	--card-color-0: #ffe0e3;
+	--card-color-1: #c7f0ff;
+	--card-color-2: #ffd8a8;
+	--card-color-3: #d9f2d9;
+	--card-color-4: #e5d7ff;
+	--card-color-5: #f9f7d9;
+	--card-color-6: #d2f0f8;
+	--card-color-7: #ffd4f5;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	background-color: var(--bg-base-color);
+	background-image: linear-gradient(0deg, var(--bg-grid-color) 1px, transparent 0),
+		linear-gradient(90deg, var(--bg-grid-color) 1px, transparent 0);
+	background-size: 30px 30px;
+	color: var(--text-primary);
+	min-height: 100dvh;
+	overflow: hidden;
+}
+
+body.is-mobile {
+	overflow-y: auto;
+}
+
+#board {
+	position: relative;
+	width: 100vw;
+	height: 100dvh;
+	overflow: hidden;
+}
+
+body.is-mobile #board {
+	height: auto;
+	min-height: 100dvh;
+}
+
+.card {
+	position: absolute;
+	width: 220px;
+	border-radius: 12px;
+	/* 较轻的阴影以减少重绘开销 */
+	box-shadow: 0 12px 24px var(--card-shadow);
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	overflow: hidden;
+	opacity: 0;
+	transform-origin: center;
+	/* 提示浏览器进行合成层优化 */
+	will-change: transform, opacity;
+	/* 限制布局/绘制影响范围 */
+	contain: layout paint;
+	transition: transform 0.35s ease, opacity 0.35s ease, left 0.35s ease,
+		top 0.35s ease, width 0.35s ease, height 0.35s ease,
+		border-radius 0.35s ease, background-color 0.3s ease;
+}
+
+/* 卡片颜色类 */
+.card.color-0 { background: var(--card-color-0); }
+.card.color-1 { background: var(--card-color-1); }
+.card.color-2 { background: var(--card-color-2); }
+.card.color-3 { background: var(--card-color-3); }
+.card.color-4 { background: var(--card-color-4); }
+.card.color-5 { background: var(--card-color-5); }
+.card.color-6 { background: var(--card-color-6); }
+.card.color-7 { background: var(--card-color-7); }
+
+.card.dragging {
+	transition: none;
+	box-shadow: 0 22px 45px var(--card-shadow-drag);
+}
+
+.card.maximized {
+	box-shadow: 0 28px 60px var(--card-shadow-max);
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 12px;
+	background: rgba(0, 0, 0, 0.15);
+	cursor: grab;
+	user-select: none;
+	touch-action: none;
+}
+
+body.light-theme .card-header {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.card-header.dragging {
+	cursor: grabbing;
+}
+
+.window-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.window-controls .control {
+	position: relative;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	border: 1px solid var(--control-border);
+	background: #ccc;
+	outline: none;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.window-controls .control.close {
+	cursor: pointer;
+}
+
+.window-controls .control.minimize,
+.window-controls .control.maximize {
+	cursor: default;
+	pointer-events: none;
+}
+
+/* 可见的键盘焦点样式（无障碍改进） */
+.window-controls .control:focus-visible {
+	box-shadow: 0 0 0 3px var(--control-focus);
+}
+
+.window-controls .control.close {
+	background: #ff5f57;
+	border-color: #e0443e;
+}
+
+.window-controls .control.minimize {
+	background: #febb2e;
+	border-color: #dea123;
+}
+
+.window-controls .control.maximize {
+	background: #28c840;
+	border-color: #1aab2c;
+}
+
+.window-controls .control::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.card-header:hover .window-controls .control::after {
+	opacity: 0.8;
+}
+
+.window-controls .control.close::after {
+	content: '×';
+	width: auto;
+	height: auto;
+	background: none;
+	font-size: 10px;
+	line-height: 1;
+	font-weight: 700;
+	color: var(--control-icon-close);
+}
+
+.window-controls .control.minimize::after {
+	width: 6px;
+	height: 2px;
+	background: var(--control-icon);
+}
+
+.window-controls .control.maximize::after {
+	width: 6px;
+	height: 6px;
+	background: linear-gradient(
+		45deg,
+		var(--control-icon) 0%,
+		var(--control-icon) 45%,
+		transparent 45%,
+		transparent 55%,
+		var(--control-icon) 55%,
+		var(--control-icon) 100%
+	);
+}
+
+.card-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.75);
+	padding-left: 10px;
+	flex: 1;
+}
+
+body.light-theme .card-title {
+	color: rgba(0, 0, 0, 0.55);
+}
+
+.card-body {
+	padding: 16px;
+	font-size: 16px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.95);
+}
+
+body.light-theme .card-body {
+	color: rgba(0, 0, 0, 0.72);
+}
+
+@media (max-width: 768px) {
+	.card {
+		width: 140px;
+		border-radius: 10px;
+	}
+
+	.card-body {
+		padding: 10px;
+		font-size: 12px;
+	}
+
+	.card-title {
+		font-size: 11px;
+	}
+
+	.card-header {
+		padding: 8px 10px;
+	}
+
+	.window-controls .control {
+		width: 10px;
+		height: 10px;
+	}
+}
+
+.footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 12px 20px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-muted);
+	background: transparent;
+	z-index: 1000;
+}
+
+.footer-line {
+	margin: 4px 0;
+}
+
+.footer a {
+	color: var(--text-link);
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+}
+
+.footer a:hover {
+	color: var(--text-link-hover);
+}
+
+@media (max-width: 768px) {
+	.footer {
+		font-size: 11px;
+		padding: 10px 16px;
+	}
+}
+
+/* 主题切换按钮（仅在引导页显示） */
+.theme-toggle {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	box-shadow: 0 4px 12px var(--card-shadow);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10002;
+	transition: all 0.3s ease;
+	outline: none;
+}
+
+.theme-toggle:hover {
+	transform: scale(1.1);
+	box-shadow: 0 6px 16px var(--card-shadow-drag);
+}
+
+.theme-toggle:active {
+	transform: scale(0.95);
+}
+
+.theme-toggle:focus-visible {
+	box-shadow: 0 0 0 3px var(--control-focus);
+}
+
+.theme-toggle-icon {
+	font-size: 24px;
+	line-height: 1;
+	transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-toggle-icon {
+	transform: rotate(20deg);
+}
+
+/* 音乐控制按钮（仅在主应用显示） */
+.music-toggle {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	box-shadow: 0 4px 12px var(--card-shadow);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10002;
+	transition: all 0.3s ease;
+	outline: none;
+}
+
+.music-toggle:hover {
+	transform: scale(1.1);
+	box-shadow: 0 6px 16px var(--card-shadow-drag);
+}
+
+.music-toggle:active {
+	transform: scale(0.95);
+}
+
+.music-toggle:focus-visible {
+	box-shadow: 0 0 0 3px var(--control-focus);
+}
+
+.music-toggle-icon {
+	font-size: 24px;
+	line-height: 1;
+	transition: transform 0.3s ease;
+}
+
+/* 播放中的旋转动画 */
+.music-toggle.playing .music-toggle-icon {
+	animation: musicRotate 10s linear infinite;
+}
+
+/* 暂停时保持当前旋转角度 */
+.music-toggle.paused .music-toggle-icon {
+	animation-play-state: paused;
+}
+
+@keyframes musicRotate {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* 全屏切换按钮 */
+.fullscreen-toggle {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	box-shadow: 0 4px 12px var(--card-shadow);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10002;
+	transition: all 0.3s ease;
+	outline: none;
+}
+
+/* 移动端隐藏全屏按钮 */
+@media (max-width: 768px) {
+	.fullscreen-toggle {
+		display: none;
+	}
+}
+
+.fullscreen-toggle:hover {
+	transform: scale(1.1);
+	box-shadow: 0 6px 16px var(--card-shadow-drag);
+}
+
+.fullscreen-toggle:active {
+	transform: scale(0.95);
+}
+
+.fullscreen-toggle:focus-visible {
+	box-shadow: 0 0 0 3px var(--control-focus);
+}
+
+.fullscreen-toggle-icon {
+	font-size: 22px;
+	line-height: 1;
+	transition: transform 0.3s ease;
+}
+
+.fullscreen-toggle:hover .fullscreen-toggle-icon {
+	transform: scale(1.15);
+}
+
+@media (max-width: 768px) {
+	.theme-toggle {
+		width: 40px;
+		height: 40px;
+		top: 16px;
+		right: 16px;
+	}
+
+	.theme-toggle-icon {
+		font-size: 20px;
+	}
+
+	.music-toggle {
+		width: 40px;
+		height: 40px;
+		top: 16px;
+		right: 16px;
+	}
+
+	.music-toggle-icon {
+		font-size: 20px;
+	}
+}
+
+/* 引导页样式 */
+.welcome-page {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: var(--bg-base-color);
+	background-image: linear-gradient(0deg, var(--bg-grid-color) 1px, transparent 0),
+		linear-gradient(90deg, var(--bg-grid-color) 1px, transparent 0);
+	background-size: 30px 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10001;
+	transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.welcome-page.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.welcome-content {
+	text-align: center;
+	animation: welcomeFadeIn 1s ease-out;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	/* 向上偏移，使标题和按钮整体居中 */
+	transform: translateY(-30px);
+}
+
+.welcome-content.hidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+@keyframes welcomeFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(0px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(-30px);
+	}
+}
+
+.welcome-title {
+	font-size: 64px;
+	font-weight: 700;
+	color: var(--text-primary);
+	margin-bottom: 48px;
+	letter-spacing: -0.02em;
+}
+
+.welcome-enter {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--text-secondary);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	user-select: none;
+}
+
+.enter-arrow {
+	font-size: 24px;
+	transition: transform 0.3s ease;
+	display: inline-block;
+}
+
+.welcome-enter:hover {
+	color: var(--text-primary);
+}
+
+.welcome-enter:hover .enter-arrow {
+	transform: translateX(6px);
+}
+
+.welcome-enter:active {
+	transform: scale(0.95);
+}
+
+.welcome-enter.loading {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+/* 加载覆盖层 */
+.loading-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: transparent;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.4s ease, visibility 0.4s ease;
+	pointer-events: none;
+}
+
+.loading-overlay.visible {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+/* 加载动画 - 三个点样式 */
+.loading-spinner {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.loading-spinner::before,
+.loading-spinner::after,
+.loading-dot {
+	content: '';
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--text-primary);
+	animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.loading-spinner::before {
+	animation-delay: 0s;
+}
+
+.loading-dot {
+	animation-delay: 0.35s;
+}
+
+.loading-spinner::after {
+	animation-delay: 0.7s;
+}
+
+@keyframes dotPulse {
+	0%, 100% {
+		opacity: 0.3;
+		transform: scale(0.8);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.loading-text {
+	margin-top: 20px;
+	font-size: 14px;
+	color: var(--text-tertiary);
+	font-weight: 400;
+	letter-spacing: 0.05em;
+}
+
+/* 引导页底部信息 */
+.welcome-footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 12px 20px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-muted);
+	background: transparent;
+	z-index: 10;
+}
+
+.welcome-footer .footer-line {
+	margin: 4px 0;
+}
+
+.welcome-footer a {
+	color: var(--text-link);
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+}
+
+.welcome-footer a:hover {
+	color: var(--text-link-hover);
+}
+
+/* 主应用容器 */
+.main-app {
+	width: 100vw;
+	height: 100vh;
+	opacity: 0;
+	transition: opacity 0.6s ease;
+}
+
+.main-app.visible {
+	opacity: 1;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+	.welcome-title {
+		font-size: 48px;
+		margin-bottom: 36px;
+	}
+
+	.welcome-enter {
+		font-size: 16px;
+	}
+
+	.enter-arrow {
+		font-size: 20px;
+	}
+
+	.loading-spinner::before,
+	.loading-spinner::after,
+	.loading-dot {
+		width: 6px;
+		height: 6px;
+	}
+
+	.loading-text {
+		font-size: 12px;
+		margin-top: 16px;
+	}
+}
+
+/* 遵循系统"减少动态效果"偏好 */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		scroll-behavior: auto !important;
+	}
+
+	.card,
+	.card *,
+	.window-controls .control::after,
+	.welcome-content,
+	.loading-spinner::before,
+	.loading-spinner::after {
+		transition: none !important;
+		animation: none !important;
+	}
+}
