@@ -110,7 +110,7 @@ export class CardManager {
 		card.style.left = `${left}px`
 		card.style.top = `${top}px`
 
-		// 设置HTML内容
+		// 设置HTML内容 - 修复：确保所有控制按钮都是可点击的button元素
 		card.innerHTML = `
 			<div class="card-header">
 				<div class="window-controls">
@@ -217,18 +217,22 @@ export class CardManager {
 		// 防止快速重复点击
 		let isProcessing = false
 
+		// 关闭按钮事件
 		closeBtn.addEventListener('click', event => {
 			event.stopPropagation()
 			if (!isProcessing) {
 				isProcessing = true
 				this.closeCard(card)
+				// 关闭后不需要重置isProcessing，因为卡片会被移除
 			}
 		})
 
+		// 最小化按钮事件 - 修复：添加正确的事件处理
 		minimizeBtn.addEventListener('click', event => {
 			event.stopPropagation()
 			if (!isProcessing) {
 				isProcessing = true
+				console.log('最小化按钮被点击'); // 调试日志
 				this.minimizeCard(card)
 				// 重置处理状态，允许再次操作
 				setTimeout(() => {
@@ -237,10 +241,12 @@ export class CardManager {
 			}
 		})
 
+		// 最大化按钮事件 - 修复：添加正确的事件处理
 		maximizeBtn.addEventListener('click', event => {
 			event.stopPropagation()
 			if (!isProcessing) {
 				isProcessing = true
+				console.log('最大化按钮被点击'); // 调试日志
 				this.toggleMaximize(card)
 				// 重置处理状态，允许再次操作
 				setTimeout(() => {
@@ -255,8 +261,11 @@ export class CardManager {
 		})
 
 		// 点击卡片置顶
-		card.addEventListener('pointerdown', () => {
-			stateManager.bringToFront(card)
+		card.addEventListener('pointerdown', (event) => {
+			// 只有当点击的不是控制按钮时才置顶
+			if (!event.target.closest('.control')) {
+				stateManager.bringToFront(card)
+			}
 		})
 	}
 
@@ -395,6 +404,8 @@ export class CardManager {
 		const state = stateManager.getCardState(card)
 		if (!state || state.closing) return
 
+		console.log('执行最小化操作'); // 调试日志
+
 		const runMinimize = () => {
 			stateManager.updateCardState(card, { closing: true })
 			stateManager.bringToFront(card)
@@ -440,16 +451,16 @@ export class CardManager {
 			card.style.borderRadius = `${CONFIG.CARD.BORDER_RADIUS}px`
 
 			stateManager.updateCardState(card, {
-				left: 0,
-				top: 0,
+				left: state.beforeMaximize.left,
+				top: state.beforeMaximize.top,
 				scale: CONFIG.SCALE.NORMAL,
-				angle: 0
+				angle: state.beforeMaximize.angle
 			})
 
 			const currentState = stateManager.getCardState(card)
 			applyTransform(card, {
 				scale: currentState.scale,
-				rotate: 0
+				rotate: currentState.angle
 			})
 
 			requestAnimationFrame(() => {
@@ -469,6 +480,8 @@ export class CardManager {
 		const state = stateManager.getCardState(card)
 		if (!state || state.closing) return
 
+		console.log('切换全屏状态，当前状态:', state.maximized); // 调试日志
+
 		if (state.maximized) {
 			this.restoreFromMaximize(card)
 		} else {
@@ -482,6 +495,8 @@ export class CardManager {
 	 */
 	maximizeCard(card) {
 		const state = stateManager.getCardState(card)
+
+		console.log('执行全屏操作'); // 调试日志
 
 		// 保存全屏前的状态
 		stateManager.updateCardState(card, {
@@ -506,7 +521,8 @@ export class CardManager {
 			left: 0,
 			top: 0,
 			scale: CONFIG.SCALE.NORMAL,
-			angle: 0
+			angle: 0,
+			maximized: true
 		})
 
 		const currentState = stateManager.getCardState(card)
@@ -527,6 +543,8 @@ export class CardManager {
 		const previous = state.beforeMaximize
 		if (!previous) return
 
+		console.log('从全屏恢复'); // 调试日志
+
 		card.classList.remove('maximized')
 		card.style.left = `${previous.left}px`
 		card.style.top = `${previous.top}px`
@@ -538,7 +556,8 @@ export class CardManager {
 			left: previous.left,
 			top: previous.top,
 			scale: previous.scale ?? CONFIG.SCALE.NORMAL,
-			angle: previous.angle ?? 0
+			angle: previous.angle ?? 0,
+			maximized: false
 		})
 
 		const currentState = stateManager.getCardState(card)
