@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="description" content="一个优雅的动态便签墙应用，支持拖拽、全屏、最小化，移动端自适应。" />
+		<title>Heart Notes</title>
+		<link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
+		<link rel="stylesheet" href="src/css/styles.css" />
+	</head>
+	<body>
+		<button class="fullscreen-toggle" id="fullscreenToggle" type="button" aria-label="切换全屏">
+			<span class="fullscreen-toggle-icon">⛶</span>
+		</button>
+
+		<!-- 引导页 -->
+		<div id="welcomePage" class="welcome-page">
+			<!-- 引导页的主题切换按钮 -->
+			<button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
+				<span class="theme-toggle-icon">🌙</span>
+			</button>
+			<div class="welcome-content">
+				<h1 class="welcome-title">Heart Notes</h1>
+				<div class="welcome-enter" id="startButton">
+					<span class="enter-text">进入</span>
+					<span class="enter-arrow">→</span>
+				</div>
+			</div>
+			<!-- 加载状态 -->
+			<div class="loading-overlay" id="loadingOverlay">
+				<div class="loading-spinner">
+					<span class="loading-dot"></span>
+				</div>
+				<p class="loading-text" id="loadingText">正在准备...</p>
+			</div>
+			<!-- 引导页底部信息 -->
+			<footer class="welcome-footer">
+				<div class="footer-line">
+					Designed & Maintained by <a href="https://luzhenhua.cn/" target="_blank" rel="noopener noreferrer">Luzhenhua</a>
+				</div>
+				<div class="footer-line">
+					<a href="https://github.com/luzhenhua/Heart-Notes" target="_blank" rel="noopener noreferrer">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom; margin-right: 4px;">
+							<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+						</svg>
+						GitHub
+					</a>
+				</div>
+			</footer>
+		</div>
+
+		<!-- 主应用界面 -->
+		<div id="mainApp" class="main-app" style="display: none;">
+			<!-- 卡片页面的音乐控制按钮 -->
+			<button class="music-toggle" id="musicToggle" type="button" aria-label="音乐控制">
+				<span class="music-toggle-icon">🎵</span>
+			</button>
+			<div id="board" role="region" aria-label="便签板"></div>
+			<footer class="footer">
+				<div class="footer-line">
+					Designed & Maintained by <a href="https://luzhenhua.cn/" target="_blank" rel="noopener noreferrer">Luzhenhua</a>
+				</div>
+				<div class="footer-line">
+					<a href="https://github.com/luzhenhua/Heart-Notes" target="_blank" rel="noopener noreferrer">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom; margin-right: 4px;">
+							<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+						</svg>
+						GitHub
+					</a>
+				</div>
+			</footer>
+		</div>
+		<noscript>需要启用 JavaScript 才能使用便签墙。</noscript>
+		<script type="module" src="src/js/app.js"></script>
+	</body>
+</html>
