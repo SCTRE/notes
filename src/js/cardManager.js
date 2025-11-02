@@ -115,8 +115,8 @@ export class CardManager {
 			<div class="card-header">
 				<div class="window-controls">
 					<button class="control close" type="button" aria-label="关闭"></button>
-					<span class="control minimize"></span>
-					<span class="control maximize"></span>
+					<button class="control minimize" type="button" aria-label="最小化"></button>
+					<button class="control maximize" type="button" aria-label="最大化"></button>
 				</div>
 				<div class="card-title">温馨提示</div>
 			</div>
@@ -211,6 +211,8 @@ export class CardManager {
 	setupInteractions(card) {
 		const header = card.querySelector('.card-header')
 		const closeBtn = card.querySelector('.control.close')
+		const minimizeBtn = card.querySelector('.control.minimize')
+		const maximizeBtn = card.querySelector('.control.maximize')
 
 		// 防止快速重复点击
 		let isProcessing = false
@@ -220,6 +222,30 @@ export class CardManager {
 			if (!isProcessing) {
 				isProcessing = true
 				this.closeCard(card)
+			}
+		})
+
+		minimizeBtn.addEventListener('click', event => {
+			event.stopPropagation()
+			if (!isProcessing) {
+				isProcessing = true
+				this.minimizeCard(card)
+				// 重置处理状态，允许再次操作
+				setTimeout(() => {
+					isProcessing = false
+				}, CONFIG.ANIMATION.TRANSITION_DURATION)
+			}
+		})
+
+		maximizeBtn.addEventListener('click', event => {
+			event.stopPropagation()
+			if (!isProcessing) {
+				isProcessing = true
+				this.toggleMaximize(card)
+				// 重置处理状态，允许再次操作
+				setTimeout(() => {
+					isProcessing = false
+				}, CONFIG.ANIMATION.TRANSITION_DURATION)
 			}
 		})
 
