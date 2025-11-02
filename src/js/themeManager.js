@@ -20,7 +20,7 @@ export class ThemeManager {
 	 */
 	getInitialTheme() {
 		const savedTheme = localStorage.getItem('theme')
-		return savedTheme || 'dark'
+		return savedTheme || 'light'
 	}
 
 	/**
