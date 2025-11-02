@@ -10,6 +10,7 @@ class AudioManager {
 		this.audio = null
 		this.isLoaded = false
 		this.isPlaying = false
+		this.hasPlayed = false // 新增：记录是否已经播放过
 	}
 
 	/**
@@ -63,10 +64,17 @@ class AudioManager {
 			return
 		}
 
+		// 新增：检查是否已经播放过，如果播放过则跳过
+		if (this.hasPlayed) {
+			if (CONFIG.DEBUG) console.log('音乐已经播放过，跳过重复播放')
+			return
+		}
+
 		try {
 			// 现代浏览器需要用户交互才能播放音频
 			await this.audio.play()
 			this.isPlaying = true
+			this.hasPlayed = true // 标记为已播放
 			if (CONFIG.DEBUG) console.log('背景音乐开始播放')
 		} catch (error) {
 			// 自动播放被阻止是正常的，可以忽略
@@ -108,6 +116,15 @@ class AudioManager {
 	}
 
 	/**
+	 * 重置播放状态，允许音乐再次播放
+	 */
+	resetPlayState() {
+		this.hasPlayed = false
+		this.isPlaying = false
+		if (CONFIG.DEBUG) console.log('音乐播放状态已重置')
+	}
+
+	/**
 	 * 销毁音乐管理器
 	 */
 	destroy() {
@@ -118,6 +135,7 @@ class AudioManager {
 		}
 		this.isLoaded = false
 		this.isPlaying = false
+		this.hasPlayed = false
 	}
 }
 
